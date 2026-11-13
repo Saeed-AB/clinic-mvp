@@ -33,15 +33,15 @@ export default function DashboardPage() {
       </div>
 
       <Card className="p-4 sm:p-5">
-        <PatientSearchBox size="lg" />
+        <PatientSearchBox />
         <div className="mt-4 grid gap-2 sm:grid-cols-3">
-          <Button size="lg" onClick={() => openDrawer("visit")} className="justify-start">
+          <Button onClick={() => openDrawer("visit")} className="justify-start">
             <CalendarPlus /> زيارة جديدة
           </Button>
-          <Button size="lg" variant="outline" onClick={() => openDrawer("patient")} className="justify-start">
+          <Button variant="outline" onClick={() => openDrawer("patient")} className="justify-start">
             <UserPlus /> مريض جديد
           </Button>
-          <Link href="/debtors" className="inline-flex h-12 items-center gap-2 rounded-lg border border-border bg-surface px-5 text-base font-medium hover:bg-muted">
+          <Link href="/debtors" className="inline-flex h-10 items-center gap-2 rounded-lg border border-border bg-surface px-4 text-sm font-medium hover:bg-muted max-sm:h-11">
             <HandCoins className="size-4" /> المدينون والسداد
           </Link>
         </div>

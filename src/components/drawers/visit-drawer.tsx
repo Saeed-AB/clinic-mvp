@@ -10,11 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { BalanceBadge } from "@/components/shared/badges";
+import { DateField } from "@/components/shared/date-field";
 import { Money } from "@/components/shared/money";
 import { MoneyInput } from "@/components/shared/money-input";
 import { errorMessage } from "@/lib/api/client";
 import { formKeyHandler } from "@/lib/form-keys";
-import { addDays, formatWeekday, todayAden } from "@/lib/format/date";
+import { formatWeekday, todayAden } from "@/lib/format/date";
 import { CURRENCY_LABEL, formatMoney, toLatinDigits } from "@/lib/format/money";
 import { patientSchema } from "@/lib/schemas";
 import { patientsService } from "@/lib/services/patients";
@@ -328,12 +329,7 @@ export function VisitDrawer() {
           {/* 2. التاريخ + 3. الطبيب */}
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="2. التاريخ" htmlFor="v-date" error={errors.date} hint={isToday ? "اليوم — تُسجل كزيارة مفتوحة" : `${formatWeekday(date)} — تُسجل كزيارة مجدولة`}>
-              <div className="flex gap-1.5">
-                <Input id="v-date" type="date" min={today} value={date} onChange={(e) => e.target.value && setDate(e.target.value)} className="flex-1" />
-                <Button variant="outline" size="sm" className="h-10 max-sm:h-11" onClick={() => setDate(isToday ? addDays(today, 1) : today)}>
-                  {isToday ? "غدًا" : "اليوم"}
-                </Button>
-              </div>
+              <DateField value={date} onChange={setDate} min={today} className="w-full" />
             </Field>
             <Field label="3. الطبيب" htmlFor="v-doctor" required error={errors.doctorId}>
               <Select value={doctorId} onValueChange={setDoctorId}>

@@ -46,7 +46,7 @@ function ClosingView() {
       />
 
       <div className="no-print flex flex-wrap items-center gap-3">
-        <DateNav value={date} onChange={(d) => router.replace(d === today ? pathname : `${pathname}?date=${d}`)} disabled={!isAdmin} showTomorrow={false} max={today} />
+        <DateNav value={date} onChange={(d) => router.replace(d === today ? pathname : `${pathname}?date=${d}`)} disabled={!isAdmin} max={today} />
         {!isAdmin ? <p className="text-xs text-muted-foreground">المسجل يعرض إقفال يومه فقط</p> : null}
       </div>
 

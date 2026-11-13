@@ -40,6 +40,24 @@ export function adenDateTimeToIso(date: string, hour: number, minute: number): s
   return new Date(Date.UTC(y, m - 1, d, hour - 3, minute)).toISOString();
 }
 
+/**
+ * تحويل بين YYYY-MM-DD ومكوّن Date محلي، خاص بمكوّنات اختيار التاريخ على العميل (مثل Calendar)
+ * فقط — تستخدم توقيت المتصفح المحلي عمدًا (لا عدن) لأن Date هنا تمثيل داخلي مؤقت لواجهة
+ * الاختيار نفسها فقط، والقيمة الفعلية المرسلة للمنطق التجاري تبقى سلسلة YYYY-MM-DD بتوقيت عدن
+ * (todayAden/addDays). لا تُستخدم هذه الدوال خارج مكوّنات العميل البصرية.
+ */
+export function ymdToDate(date: string): Date {
+  const [y, m, d] = date.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+export function dateToYmd(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 export function currentYearAden(): number {
   return Number(todayAden().slice(0, 4));
 }
