@@ -32,7 +32,7 @@ export function LoginForm() {
     try {
       await authService.login(values.username, values.password);
       const next = params.get("next");
-      router.replace(next && next.startsWith("/") ? next : "/");
+      router.replace(next && next.startsWith("/") && !next.startsWith("//") ? next : "/");
       router.refresh();
     } catch (e) {
       setError(errorMessage(e));

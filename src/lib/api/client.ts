@@ -24,7 +24,11 @@ api.interceptors.response.use(
     const body = error.response?.data?.error;
     if (status === 401 && typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
       const next = encodeURIComponent(window.location.pathname + window.location.search);
-      window.location.href = `/login?next=${next}`;
+      fetch("/api/auth/logout", { method: "POST", credentials: "include" })
+        .catch(() => null)
+        .finally(() => {
+          window.location.href = `/login?next=${next}`;
+        });
     }
     if (body) return Promise.reject(new ApiError(body.code, body.message, status));
     if (error.code === "ECONNABORTED") return Promise.reject(new ApiError("TIMEOUT", "استغرق الطلب وقتًا طويلًا، تحقق من الاتصال وحاول مرة أخرى"));

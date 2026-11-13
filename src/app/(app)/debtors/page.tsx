@@ -35,6 +35,8 @@ function DebtorsView() {
   const [term, setTerm] = useState(q);
   const [exporting, setExporting] = useState(false);
 
+  useEffect(() => setTerm(q), [q]);
+
   const setParam = (key: string, value: string) => {
     const next = new URLSearchParams(params.toString());
     if (value) next.set(key, value);

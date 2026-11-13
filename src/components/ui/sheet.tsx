@@ -30,7 +30,7 @@ export function Sheet({
         <DialogPrimitive.Content
           dir="rtl"
           className={cn(
-            "anim-sheet fixed inset-y-0 right-0 z-50 flex w-full flex-col bg-surface shadow-2xl outline-none sm:max-w-lg sm:border-s sm:border-border",
+            "anim-sheet fixed inset-y-0 right-0 z-50 flex w-full flex-col bg-surface shadow-2xl outline-none sm:max-w-lg sm:border-e sm:border-border",
             className,
           )}
         >

@@ -261,6 +261,7 @@ export default function VisitDetailsPage() {
             {canPay ? (
               <div className="no-print border-t border-border p-4">
                 <AddPaymentRow
+                  key={totals.remaining}
                   remaining={totals.remaining}
                   currency={currency}
                   methods={lookups?.paymentMethods.filter((m) => m.active) ?? []}

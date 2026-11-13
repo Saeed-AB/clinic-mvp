@@ -22,7 +22,10 @@ export function ok<T>(data: T, init?: ResponseInit) {
 
 export function fail(error: unknown) {
   if (error instanceof AppError) {
-    return NextResponse.json({ error: { code: error.code, message: error.message } }, { status: STATUS[error.code] });
+    const res = NextResponse.json({ error: { code: error.code, message: error.message } }, { status: STATUS[error.code] });
+    // جلسة لمستخدم موقوف أو غير موجود: نحذفها حتى لا يدور المتصفح بين /login و /
+    if (error.code === "UNAUTHORIZED") res.cookies.delete(SESSION_COOKIE);
+    return res;
   }
   if (error instanceof ZodError) {
     const first = error.issues[0];
