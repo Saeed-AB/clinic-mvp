@@ -6,8 +6,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
-import { Input, Select } from "@/components/ui/input";
-import { Sheet } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { BalanceBadge } from "@/components/shared/badges";
 import { Money } from "@/components/shared/money";
 import { MoneyInput } from "@/components/shared/money-input";
@@ -189,25 +190,13 @@ export function VisitDrawer() {
 
   return (
     <>
-      <Sheet
-        open={isOpen}
-        onOpenChange={requestClose}
-        title="زيارة جديدة"
-        description="تسجيل حضور مريض أو جدولة زيارة"
-        footer={
-          <div className="flex items-center gap-3">
-            <div className="min-w-0 flex-1">
-              <p className="text-xs text-muted-foreground">إجمالي الخدمات</p>
-              <p className="text-lg font-bold">
-                <Money value={total} currency={currency} />
-              </p>
-            </div>
-            <Button size="lg" loading={saving} onClick={save}>
-              {isToday ? "تسجيل الحضور" : "جدولة الزيارة"}
-            </Button>
-          </div>
-        }
-      >
+      <Sheet open={isOpen} onOpenChange={requestClose}>
+        <SheetContent>
+        <SheetHeader>
+          <SheetTitle>زيارة جديدة</SheetTitle>
+          <SheetDescription>تسجيل حضور مريض أو جدولة زيارة</SheetDescription>
+        </SheetHeader>
+        <SheetBody>
         <form noValidate onKeyDown={formKeyHandler(save)} onSubmit={(e) => e.preventDefault()} onChange={() => setDirty(true)} className="space-y-5">
           {serverError ? (
             <p role="alert" className="rounded-lg bg-debt-soft px-3 py-2.5 text-sm text-debt">
@@ -347,13 +336,17 @@ export function VisitDrawer() {
               </div>
             </Field>
             <Field label="3. الطبيب" htmlFor="v-doctor" required error={errors.doctorId}>
-              <Select id="v-doctor" value={doctorId} aria-invalid={!!errors.doctorId} onChange={(e) => setDoctorId(e.target.value)}>
-                <option value="">اختر الطبيب</option>
-                {activeDoctors.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.name} — {d.specialty}
-                  </option>
-                ))}
+              <Select value={doctorId} onValueChange={setDoctorId}>
+                <SelectTrigger id="v-doctor" aria-invalid={!!errors.doctorId}>
+                  <SelectValue placeholder="اختر الطبيب" />
+                </SelectTrigger>
+                <SelectContent>
+                  {activeDoctors.map((d) => (
+                    <SelectItem key={d.id} value={d.id}>
+                      {d.name} — {d.specialty}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
             </Field>
           </div>
@@ -385,13 +378,17 @@ export function VisitDrawer() {
               <p className="text-sm text-muted-foreground">لا توجد خدمات بعد. يمكن إضافتها الآن أو لاحقًا بعد خروج المريض من الطبيب.</p>
             )}
             <div className="flex gap-2">
-              <Select aria-label="إضافة خدمة" value={addServiceId} onChange={(e) => addLine(e.target.value)} className="flex-1">
-                <option value="">+ إضافة خدمة</option>
-                {activeServices.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name} — {formatMoney(s.defaultPrice, currency)}
-                  </option>
-                ))}
+              <Select value={addServiceId} onValueChange={addLine}>
+                <SelectTrigger aria-label="إضافة خدمة" className="flex-1">
+                  <SelectValue placeholder="+ إضافة خدمة" />
+                </SelectTrigger>
+                <SelectContent>
+                  {activeServices.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name} — {formatMoney(s.defaultPrice, currency)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
             </div>
           </section>
@@ -408,12 +405,17 @@ export function VisitDrawer() {
                     <MoneyInput id="v-amount" value={payAmount} suffix={CURRENCY_LABEL[currency]} onChange={(e) => setPayAmount(e.target.value)} />
                   </Field>
                   <Field label="طريقة الدفع" htmlFor="v-method" error={errors.payMethod}>
-                    <Select id="v-method" value={payMethod} onChange={(e) => setPayMethod(e.target.value)}>
-                      {activeMethods.map((m) => (
-                        <option key={m.id} value={m.id}>
-                          {m.name}
-                        </option>
-                      ))}
+                    <Select value={payMethod} onValueChange={setPayMethod}>
+                      <SelectTrigger id="v-method" aria-invalid={!!errors.payMethod}>
+                        <SelectValue placeholder="اختر طريقة الدفع" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {activeMethods.map((m) => (
+                          <SelectItem key={m.id} value={m.id}>
+                            {m.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
                     </Select>
                   </Field>
                 </div>
@@ -444,6 +446,21 @@ export function VisitDrawer() {
             </p>
           )}
         </form>
+        </SheetBody>
+        <SheetFooter>
+          <div className="flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-muted-foreground">إجمالي الخدمات</p>
+              <p className="text-lg font-bold">
+                <Money value={total} currency={currency} />
+              </p>
+            </div>
+            <Button size="lg" loading={saving} onClick={save}>
+              {isToday ? "تسجيل الحضور" : "جدولة الزيارة"}
+            </Button>
+          </div>
+        </SheetFooter>
+        </SheetContent>
       </Sheet>
       <UnsavedGuard open={guard} onOpenChange={setGuard} onDiscard={close} />
     </>

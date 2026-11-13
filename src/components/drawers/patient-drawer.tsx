@@ -8,8 +8,9 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
-import { Input, Textarea } from "@/components/ui/input";
-import { Sheet } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Textarea } from "@/components/ui/textarea";
 import { Money } from "@/components/shared/money";
 import { errorMessage } from "@/lib/api/client";
 import { formKeyHandler } from "@/lib/form-keys";
@@ -134,28 +135,13 @@ export function PatientDrawer() {
 
   return (
     <>
-      <Sheet
-        open={isOpen}
-        onOpenChange={requestClose}
-        title={title}
-        description={editId ? editing?.name : "الحقول المطلوبة: الاسم الرباعي والجنس فقط"}
-        footer={
-          saved ? null : editId ? (
-            <Button className="w-full" loading={isSubmitting} onClick={submit(false)} disabled={loadingEdit}>
-              حفظ التعديلات
-            </Button>
-          ) : (
-            <div className="flex gap-2">
-              <Button className="flex-1" loading={isSubmitting} onClick={submit(true)}>
-                <CalendarPlus /> حفظ وتسجيل زيارة
-              </Button>
-              <Button variant="outline" onClick={submit(false)} disabled={isSubmitting}>
-                حفظ
-              </Button>
-            </div>
-          )
-        }
-      >
+      <Sheet open={isOpen} onOpenChange={requestClose}>
+        <SheetContent>
+        <SheetHeader>
+          <SheetTitle>{title}</SheetTitle>
+          <SheetDescription>{editId ? editing?.name : "الحقول المطلوبة: الاسم الرباعي والجنس فقط"}</SheetDescription>
+        </SheetHeader>
+        <SheetBody>
         {saved ? (
           <div className="flex flex-col items-center py-6 text-center">
             <div className="mb-4 rounded-full bg-settled-soft p-3 text-settled">
@@ -257,6 +243,26 @@ export function PatientDrawer() {
             </p>
           </form>
         )}
+        </SheetBody>
+        {saved ? null : (
+          <SheetFooter>
+            {editId ? (
+              <Button className="w-full" loading={isSubmitting} onClick={submit(false)} disabled={loadingEdit}>
+                حفظ التعديلات
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button className="flex-1" loading={isSubmitting} onClick={submit(true)}>
+                  <CalendarPlus /> حفظ وتسجيل زيارة
+                </Button>
+                <Button variant="outline" onClick={submit(false)} disabled={isSubmitting}>
+                  حفظ
+                </Button>
+              </div>
+            )}
+          </SheetFooter>
+        )}
+        </SheetContent>
       </Sheet>
       <UnsavedGuard
         open={guard}

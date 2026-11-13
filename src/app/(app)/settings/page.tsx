@@ -7,13 +7,14 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
-import { Dialog } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
-import { Input, Select } from "@/components/ui/input";
-import { Sheet } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
-import { Table, Td, Th } from "@/components/ui/table";
-import { Tabs } from "@/components/ui/tabs";
+import { Table, TableBody, TableHeader, TableRow, Td, Th } from "@/components/ui/table";
+import { SimpleTabs } from "@/components/ui/tabs";
 import { ConfirmDialog } from "@/components/shared/cancel-dialog";
 import { Money } from "@/components/shared/money";
 import { MoneyInput } from "@/components/shared/money-input";
@@ -48,7 +49,7 @@ function SettingsView() {
   return (
     <div className="space-y-5">
       <PageHeader title="الإعدادات" description="كل القوائم فيها إضافة وتعديل وإيقاف، بدون حذف، حتى لا تتأثر البيانات القديمة." />
-      <Tabs value={tab} onChange={(v) => router.replace(v === "clinic" ? pathname : `${pathname}?tab=${v}`, { scroll: false })} items={TABS} />
+      <SimpleTabs value={tab} onChange={(v) => router.replace(v === "clinic" ? pathname : `${pathname}?tab=${v}`, { scroll: false })} items={TABS} />
       {loading && !data ? (
         <LoadingRows rows={6} />
       ) : error && !data ? (
@@ -129,12 +130,17 @@ function ClinicTab({ data }: { data: Settings }) {
           <Input id="c-phone" dir="ltr" className="num text-start" value={form.phone} onChange={(e) => setForm({ ...form, phone: toLatinDigits(e.target.value) })} />
         </Field>
         <Field label="العملة الأساسية" htmlFor="c-currency" hint="تُحفظ العملة مع كل عملية مالية">
-          <Select id="c-currency" value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value as Currency })}>
-            {(Object.keys(CURRENCY_LABEL) as Currency[]).map((c) => (
-              <option key={c} value={c}>
-                {CURRENCY_LABEL[c]}
-              </option>
-            ))}
+          <Select value={form.currency} onValueChange={(v) => setForm({ ...form, currency: v as Currency })}>
+            <SelectTrigger id="c-currency">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {(Object.keys(CURRENCY_LABEL) as Currency[]).map((c) => (
+                <SelectItem key={c} value={c}>
+                  {CURRENCY_LABEL[c]}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </Field>
         <Field label="رقم بداية ملفات المرضى" htmlFor="c-start" hint="المرضى الجدد يأخذون الرقم التالي لأكبر رقم موجود">
@@ -232,8 +238,8 @@ function ListTab<T extends { id: string; active: boolean; name: string }>({
         }
       />
       <Table>
-        <thead>
-          <tr>
+        <TableHeader>
+          <TableRow>
             {columns.map((c) => (
               <Th key={c.header} className={c.className}>
                 {c.header}
@@ -243,11 +249,11 @@ function ListTab<T extends { id: string; active: boolean; name: string }>({
             <Th>
               <span className="sr-only">إجراءات</span>
             </Th>
-          </tr>
-        </thead>
-        <tbody>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {items.map((item) => (
-            <tr key={item.id} className={cn(!item.active && "text-muted-foreground")}>
+            <TableRow key={item.id} className={cn(!item.active && "text-muted-foreground")}>
               {columns.map((c) => (
                 <Td key={c.header} className={c.className}>
                   {c.cell(item)}
@@ -255,7 +261,11 @@ function ListTab<T extends { id: string; active: boolean; name: string }>({
               ))}
               <Td>
                 <div className="flex items-center gap-2">
-                  <Switch checked={item.active} onChange={(v) => toggle(item, v)} label={`${item.active ? "إيقاف" : "تفعيل"} ${item.name}`} />
+                  <Switch
+                    checked={item.active}
+                    onCheckedChange={(v) => toggle(item, v)}
+                    aria-label={`${item.active ? "إيقاف" : "تفعيل"} ${item.name}`}
+                  />
                   <span className="text-xs">{item.active ? "فعّال" : "موقوف"}</span>
                 </div>
               </Td>
@@ -265,32 +275,36 @@ function ListTab<T extends { id: string; active: boolean; name: string }>({
                   <Pencil />
                 </Button>
               </Td>
-            </tr>
+            </TableRow>
           ))}
-        </tbody>
+        </TableBody>
       </Table>
 
-      <Sheet
-        open={editing !== null}
-        onOpenChange={(v) => !v && setEditing(null)}
-        title={isNew ? addLabel : `تعديل: ${editing && editing !== "new" ? editing.name : ""}`}
-        footer={
-          <Button className="w-full" loading={busy} onClick={save}>
-            {isNew ? "إضافة" : "حفظ التعديل"}
-          </Button>
-        }
-      >
-        <form
-          className="space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            save();
-          }}
-        >
-          {err ? <p role="alert" className="rounded-lg bg-debt-soft px-3 py-2 text-sm text-debt">{err}</p> : null}
-          {renderForm(form, (k, v) => setForm((f) => ({ ...f, [k]: v })), isNew)}
-          <button type="submit" hidden />
-        </form>
+      <Sheet open={editing !== null} onOpenChange={(v) => !v && setEditing(null)}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>{isNew ? addLabel : `تعديل: ${editing && editing !== "new" ? editing.name : ""}`}</SheetTitle>
+            <SheetDescription className="sr-only">نموذج إضافة أو تعديل</SheetDescription>
+          </SheetHeader>
+          <SheetBody>
+            <form
+              className="space-y-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                save();
+              }}
+            >
+              {err ? <p role="alert" className="rounded-lg bg-debt-soft px-3 py-2 text-sm text-debt">{err}</p> : null}
+              {renderForm(form, (k, v) => setForm((f) => ({ ...f, [k]: v })), isNew)}
+              <button type="submit" hidden />
+            </form>
+          </SheetBody>
+          <SheetFooter>
+            <Button className="w-full" loading={busy} onClick={save}>
+              {isNew ? "إضافة" : "حفظ التعديل"}
+            </Button>
+          </SheetFooter>
+        </SheetContent>
       </Sheet>
     </Card>
   );
@@ -451,9 +465,14 @@ function UsersTab({ data }: { data: Settings }) {
               <Input id="u-username" dir="ltr" className="text-start" value={String(f.username)} onChange={(e) => set("username", e.target.value)} />
             </Field>
             <Field label="الصلاحية" htmlFor="u-role" required>
-              <Select id="u-role" value={String(f.role)} onChange={(e) => set("role", e.target.value)}>
-                <option value="receptionist">مسجل (موظف الاستقبال)</option>
-                <option value="admin">مدير</option>
+              <Select value={String(f.role)} onValueChange={(v) => set("role", v)}>
+                <SelectTrigger id="u-role">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="receptionist">مسجل (موظف الاستقبال)</SelectItem>
+                  <SelectItem value="admin">مدير</SelectItem>
+                </SelectContent>
               </Select>
             </Field>
             {isNew ? (
@@ -475,13 +494,14 @@ function UsersTab({ data }: { data: Settings }) {
           setTemp({ name: reset!.name, password: r.temporaryPassword });
         }}
       />
-      <Dialog
-        open={!!temp}
-        onOpenChange={(v) => !v && setTemp(null)}
-        title="كلمة المرور المؤقتة"
-        description={`أعطها لـ ${temp?.name ?? ""}. لن تظهر مرة أخرى.`}
-        footer={
-          <>
+      <Dialog open={!!temp} onOpenChange={(v) => !v && setTemp(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>كلمة المرور المؤقتة</DialogTitle>
+            <DialogDescription>أعطها لـ {temp?.name ?? ""}. لن تظهر مرة أخرى.</DialogDescription>
+          </DialogHeader>
+          <p className="num mt-4 w-full rounded-lg bg-muted py-4 text-center text-2xl font-bold tracking-widest">{temp?.password}</p>
+          <DialogFooter>
             <Button
               variant="outline"
               onClick={() => {
@@ -492,10 +512,8 @@ function UsersTab({ data }: { data: Settings }) {
               نسخ
             </Button>
             <Button onClick={() => setTemp(null)}>تم</Button>
-          </>
-        }
-      >
-        <p className="num w-full rounded-lg bg-muted py-4 text-center text-2xl font-bold tracking-widest">{temp?.password}</p>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
     </>
   );

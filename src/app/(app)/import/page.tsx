@@ -6,9 +6,10 @@ import { useRef, useState, type KeyboardEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
-import { Input, Select } from "@/components/ui/input";
-import { Table, Td, Th } from "@/components/ui/table";
-import { Tabs } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableHeader, TableRow, Td, Th } from "@/components/ui/table";
+import { SimpleTabs } from "@/components/ui/tabs";
 import { Money, Num } from "@/components/shared/money";
 import { PageHeader } from "@/components/shared/states";
 import { errorMessage } from "@/lib/api/client";
@@ -73,7 +74,7 @@ export default function ImportPage() {
   return (
     <div className="space-y-5">
       <PageHeader title="استيراد الأرصدة الافتتاحية" description="نقل المرضى والديون القديمة من الدفتر للنظام. كل سطر ينشئ مريضًا جديدًا ويضيف له رصيدًا افتتاحيًا." />
-      <Tabs
+      <SimpleTabs
         value={mode}
         onChange={setMode}
         items={[
@@ -172,8 +173,8 @@ function QuickEntry() {
           }
         />
         <Table>
-          <thead>
-            <tr>
+          <TableHeader>
+            <TableRow>
               <Th className="w-10">#</Th>
               <Th className="w-28">رقم الملف القديم</Th>
               <Th className="min-w-52">الاسم *</Th>
@@ -185,13 +186,13 @@ function QuickEntry() {
               <Th className="w-10">
                 <span className="sr-only">حذف</span>
               </Th>
-            </tr>
-          </thead>
-          <tbody ref={tableRef}>
+            </TableRow>
+          </TableHeader>
+          <TableBody ref={tableRef}>
             {rows.map((r, i) => {
               const errs = errors[r.key];
               return (
-                <tr key={r.key} data-row={r.key} className={cn(errs && "bg-debt-soft/50")}>
+                <TableRow key={r.key} data-row={r.key} className={cn(errs && "bg-debt-soft/50")}>
                   <Td className="text-xs text-muted-foreground">
                     <Num value={i + 1} />
                   </Td>
@@ -203,10 +204,15 @@ function QuickEntry() {
                     {errs ? <p className="mt-1 text-xs text-debt">{errs.join("، ")}</p> : null}
                   </Td>
                   <Td>
-                    <Select aria-label={`الجنس سطر ${i + 1}`} className="h-9" value={r.gender} onChange={(e) => update(r.key, "gender", e.target.value)}>
-                      <option value="">—</option>
-                      <option value="male">ذكر</option>
-                      <option value="female">أنثى</option>
+                    <Select value={r.gender || "unset"} onValueChange={(v) => update(r.key, "gender", v === "unset" ? "" : v)}>
+                      <SelectTrigger aria-label={`الجنس سطر ${i + 1}`} className="h-9">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="unset">—</SelectItem>
+                        <SelectItem value="male">ذكر</SelectItem>
+                        <SelectItem value="female">أنثى</SelectItem>
+                      </SelectContent>
                     </Select>
                   </Td>
                   <Td>
@@ -226,10 +232,10 @@ function QuickEntry() {
                       <Trash2 className="text-muted-foreground" />
                     </Button>
                   </Td>
-                </tr>
+                </TableRow>
               );
             })}
-          </tbody>
+          </TableBody>
         </Table>
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border p-4">
           <Button variant="outline" onClick={() => addRow()}>
@@ -392,8 +398,8 @@ function ExcelImport() {
             }
           />
           <Table>
-            <thead>
-              <tr>
+            <TableHeader>
+              <TableRow>
                 <Th>#</Th>
                 <Th>رقم الملف</Th>
                 <Th>الاسم</Th>
@@ -402,11 +408,11 @@ function ExcelImport() {
                 <Th>الجوال</Th>
                 <Th className="text-end">المبلغ</Th>
                 <Th>الحالة</Th>
-              </tr>
-            </thead>
-            <tbody>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {preview.rows.map((r) => (
-                <tr key={r.index} className={cn(r.errors.length && "bg-debt-soft/50")}>
+                <TableRow key={r.index} className={cn(r.errors.length && "bg-debt-soft/50")}>
                   <Td className="text-xs text-muted-foreground">
                     <Num value={r.index + 2} />
                   </Td>
@@ -427,9 +433,9 @@ function ExcelImport() {
                       </span>
                     )}
                   </Td>
-                </tr>
+                </TableRow>
               ))}
-            </tbody>
+            </TableBody>
           </Table>
           <p className="border-t border-border px-4 py-2 text-xs text-muted-foreground"># = رقم السطر في ملف الإكسل</p>
         </Card>

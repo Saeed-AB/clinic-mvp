@@ -7,10 +7,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
-import { Dialog } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
-import { Textarea } from "@/components/ui/input";
-import { Table, Td, Th } from "@/components/ui/table";
+import { Table, TableBody, TableHeader, TableRow, Td, Th } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { CancelledBadge, INDICATOR_LABEL, indicatorText } from "@/components/shared/badges";
 import { Money, Num } from "@/components/shared/money";
@@ -125,8 +125,8 @@ export default function PatientPage() {
         ) : (
           <>
             <Table>
-              <thead>
-                <tr>
+              <TableHeader>
+                <TableRow>
                   <Th>التاريخ</Th>
                   <Th>النوع</Th>
                   <Th className="max-md:hidden">الطبيب</Th>
@@ -134,11 +134,11 @@ export default function PatientPage() {
                   <Th className="text-end">مدين</Th>
                   <Th className="text-end">دائن</Th>
                   <Th className="text-end">الرصيد بعدها</Th>
-                </tr>
-              </thead>
-              <tbody>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {shown.map((e) => (
-                  <tr key={`${e.type}-${e.id}`} className={cn(e.cancelled && "text-muted-foreground", e.visitId && e.type === "visit" && "hover:bg-muted/50")}>
+                  <TableRow key={`${e.type}-${e.id}`} className={cn(e.cancelled && "text-muted-foreground", e.visitId && e.type === "visit" && "hover:bg-muted/50")}>
                     <Td className="text-xs whitespace-nowrap">
                       <Num value={formatDateTime(e.date)} />
                     </Td>
@@ -167,9 +167,9 @@ export default function PatientPage() {
                     <Td className="text-end font-semibold">
                       <Money value={e.balanceAfter} plain className={cn(e.balanceAfter > 0 ? "text-debt" : e.balanceAfter < 0 ? "text-credit" : "")} />
                     </Td>
-                  </tr>
+                  </TableRow>
                 ))}
-              </tbody>
+              </TableBody>
             </Table>
             {entries.length > shown.length ? (
               <div className="border-t border-border p-3 text-center">
@@ -222,10 +222,21 @@ function OpeningBalanceDialog({
           setErr(null);
         }
       }}
-      title="إضافة رصيد افتتاحي"
-      description="دين قديم من الدفتر يُضاف على رصيد المريض."
-      footer={
-        <>
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>إضافة رصيد افتتاحي</DialogTitle>
+          <DialogDescription>دين قديم من الدفتر يُضاف على رصيد المريض.</DialogDescription>
+        </DialogHeader>
+        <div className="mt-4 space-y-3">
+          <Field label="المبلغ" htmlFor="ob-amount" required error={err ?? undefined}>
+            <MoneyInput id="ob-amount" autoFocus value={amount} suffix={currencyLabel} onChange={(e) => setAmount(e.target.value)} aria-invalid={!!err} />
+          </Field>
+          <Field label="ملاحظة" htmlFor="ob-note">
+            <Textarea id="ob-note" rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder="مثال: منقول من الدفتر" />
+          </Field>
+        </div>
+        <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             تراجع
           </Button>
@@ -249,17 +260,8 @@ function OpeningBalanceDialog({
           >
             إضافة الرصيد
           </Button>
-        </>
-      }
-    >
-      <div className="space-y-3">
-        <Field label="المبلغ" htmlFor="ob-amount" required error={err ?? undefined}>
-          <MoneyInput id="ob-amount" autoFocus value={amount} suffix={currencyLabel} onChange={(e) => setAmount(e.target.value)} aria-invalid={!!err} />
-        </Field>
-        <Field label="ملاحظة" htmlFor="ob-note">
-          <Textarea id="ob-note" rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder="مثال: منقول من الدفتر" />
-        </Field>
-      </div>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 }

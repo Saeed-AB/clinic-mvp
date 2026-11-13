@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
-import { Textarea } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { errorMessage } from "@/lib/api/client";
 
 /** إلغاء موحّد لأي عملية: السبب إجباري، والعملية الملغاة تبقى ظاهرة */
@@ -51,35 +51,34 @@ export function CancelWithReasonDialog({
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-      title={title}
-      description={description ?? "لا يوجد حذف نهائي. العملية الملغاة تبقى ظاهرة بعلامة \"ملغاة\" مع السبب."}
-      footer={
-        <>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description ?? 'لا يوجد حذف نهائي. العملية الملغاة تبقى ظاهرة بعلامة "ملغاة" مع السبب.'}</DialogDescription>
+        </DialogHeader>
+        <Field label="سبب الإلغاء" htmlFor="cancel-reason" required error={error ?? undefined} className="mt-4">
+          <Textarea
+            id="cancel-reason"
+            autoFocus
+            value={reason}
+            aria-invalid={!!error}
+            onChange={(e) => {
+              setReason(e.target.value);
+              if (error) setError(null);
+            }}
+            placeholder="مثال: سُجلت بالخطأ"
+          />
+        </Field>
+        <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             تراجع
           </Button>
-          <Button variant="danger" loading={busy} onClick={submit}>
+          <Button variant="destructive" loading={busy} onClick={submit}>
             {confirmLabel}
           </Button>
-        </>
-      }
-    >
-      <Field label="سبب الإلغاء" htmlFor="cancel-reason" required error={error ?? undefined}>
-        <Textarea
-          id="cancel-reason"
-          autoFocus
-          value={reason}
-          aria-invalid={!!error}
-          onChange={(e) => {
-            setReason(e.target.value);
-            if (error) setError(null);
-          }}
-          placeholder="مثال: سُجلت بالخطأ"
-        />
-      </Field>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 }
@@ -107,18 +106,23 @@ export function ConfirmDialog({
     if (open) setError(null);
   }, [open]);
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-      title={title}
-      description={description}
-      footer={
-        <>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          {description ? <DialogDescription>{description}</DialogDescription> : <DialogDescription className="sr-only">{title}</DialogDescription>}
+        </DialogHeader>
+        {error ? (
+          <p role="alert" className="mt-4 rounded-lg bg-debt-soft px-3 py-2 text-sm text-debt">
+            {error}
+          </p>
+        ) : null}
+        <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             تراجع
           </Button>
           <Button
-            variant={danger ? "danger" : "primary"}
+            variant={danger ? "destructive" : "default"}
             loading={busy}
             onClick={async () => {
               setBusy(true);
@@ -134,14 +138,8 @@ export function ConfirmDialog({
           >
             {confirmLabel}
           </Button>
-        </>
-      }
-    >
-      {error ? (
-        <p role="alert" className="rounded-lg bg-debt-soft px-3 py-2 text-sm text-debt">
-          {error}
-        </p>
-      ) : null}
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 }

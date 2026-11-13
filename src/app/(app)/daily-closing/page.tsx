@@ -6,7 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
-import { Table, Td, Th } from "@/components/ui/table";
+import { Table, TableBody, TableHeader, TableRow, Td, Th } from "@/components/ui/table";
 import { CancelledBadge } from "@/components/shared/badges";
 import { DateNav } from "@/components/shared/date-nav";
 import { Money, Num } from "@/components/shared/money";
@@ -126,19 +126,19 @@ function ClosingView() {
             <CardHeader title="حركات اليوم" description="كل الدفعات والسدادات المسجلة" />
             {data.transactions.length ? (
               <Table>
-                <thead>
-                  <tr>
+                <TableHeader>
+                  <TableRow>
                     <Th>الوقت</Th>
                     <Th>النوع</Th>
                     <Th>المريض</Th>
                     <Th>الطريقة</Th>
                     <Th>المسجل</Th>
                     <Th className="text-end">المبلغ</Th>
-                  </tr>
-                </thead>
-                <tbody>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {data.transactions.map((t) => (
-                    <tr key={t.id} className={cn(t.cancelled && "text-muted-foreground")}>
+                    <TableRow key={t.id} className={cn(t.cancelled && "text-muted-foreground")}>
                       <Td>
                         <Num value={t.time} />
                       </Td>
@@ -159,9 +159,9 @@ function ClosingView() {
                           </span>
                         ) : null}
                       </Td>
-                    </tr>
+                    </TableRow>
                   ))}
-                </tbody>
+                </TableBody>
               </Table>
             ) : (
               <EmptyState title="لا توجد حركات مالية في هذا اليوم" className="py-8" />
@@ -179,33 +179,33 @@ function SmallTable({ title, head, rows, total, empty }: { title: string; head: 
       <CardHeader title={title} />
       {rows.length ? (
         <Table>
-          <thead>
-            <tr>
+          <TableHeader>
+            <TableRow>
               {head.map((h, i) => (
                 <Th key={h} className={i > 0 ? "text-end" : ""}>
                   {h}
                 </Th>
               ))}
-            </tr>
-          </thead>
-          <tbody>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((r, i) => (
-              <tr key={i}>
+              <TableRow key={i}>
                 {r.map((c, j) => (
                   <Td key={j} className={j > 0 ? "text-end" : ""}>
                     {c}
                   </Td>
                 ))}
-              </tr>
+              </TableRow>
             ))}
             {total ? (
-              <tr className="font-semibold">
+              <TableRow className="font-semibold">
                 <Td>الإجمالي</Td>
                 <Td />
                 <Td className="text-end">{total}</Td>
-              </tr>
+              </TableRow>
             ) : null}
-          </tbody>
+          </TableBody>
         </Table>
       ) : (
         <p className="px-4 py-6 text-center text-sm text-muted-foreground">{empty}</p>

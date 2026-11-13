@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
-import { Input, Select, Textarea } from "@/components/ui/input";
-import { Sheet } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Textarea } from "@/components/ui/textarea";
 import { BalanceBadge, indicatorText } from "@/components/shared/badges";
 import { Money } from "@/components/shared/money";
 import { MoneyInput } from "@/components/shared/money-input";
@@ -99,14 +101,13 @@ export function SettlementDrawer() {
           if (dirty) setGuard(true);
           else close();
         }}
-        title="تسجيل سداد"
-        description="سداد على الرصيد العام للمريض"
-        footer={
-          <Button className="w-full" size="lg" loading={saving} disabled={!patient} onClick={save}>
-            حفظ السداد
-          </Button>
-        }
       >
+        <SheetContent>
+        <SheetHeader>
+          <SheetTitle>تسجيل سداد</SheetTitle>
+          <SheetDescription>سداد على الرصيد العام للمريض</SheetDescription>
+        </SheetHeader>
+        <SheetBody>
         <form noValidate onKeyDown={formKeyHandler(save)} onSubmit={(e) => e.preventDefault()} className="space-y-4">
           {serverError ? (
             <p role="alert" className="rounded-lg bg-debt-soft px-3 py-2.5 text-sm text-debt">
@@ -149,12 +150,17 @@ export function SettlementDrawer() {
           ) : null}
 
           <Field label="طريقة الدفع" htmlFor="s-method" required error={errors.methodId}>
-            <Select id="s-method" value={methodId} onChange={(e) => setMethodId(e.target.value)}>
-              {methods.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name}
-                </option>
-              ))}
+            <Select value={methodId} onValueChange={setMethodId}>
+              <SelectTrigger id="s-method" aria-invalid={!!errors.methodId}>
+                <SelectValue placeholder="اختر طريقة الدفع" />
+              </SelectTrigger>
+              <SelectContent>
+                {methods.map((m) => (
+                  <SelectItem key={m.id} value={m.id}>
+                    {m.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </Field>
           <Field label="رقم السند (اختياري)" htmlFor="s-receipt">
@@ -164,6 +170,13 @@ export function SettlementDrawer() {
             <Textarea id="s-note" rows={2} value={note} onChange={(e) => setNote(e.target.value)} />
           </Field>
         </form>
+        </SheetBody>
+        <SheetFooter>
+          <Button className="w-full" size="lg" loading={saving} disabled={!patient} onClick={save}>
+            حفظ السداد
+          </Button>
+        </SheetFooter>
+        </SheetContent>
       </Sheet>
       <UnsavedGuard open={guard} onOpenChange={setGuard} onDiscard={close} />
     </>

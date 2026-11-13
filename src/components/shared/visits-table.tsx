@@ -3,7 +3,7 @@
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Table, Td, Th } from "@/components/ui/table";
+import { Table, TableBody, TableHeader, TableRow, Td, Th } from "@/components/ui/table";
 import type { Currency, VisitRow } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { VisitStatusBadge } from "./badges";
@@ -16,8 +16,8 @@ export function VisitsTable({ rows, currency, compact }: { rows: VisitRow[]; cur
     <>
       <div className="hidden md:block">
         <Table>
-          <thead>
-            <tr>
+          <TableHeader>
+            <TableRow>
               <Th>الوقت</Th>
               <Th>رقم الملف</Th>
               <Th>الاسم</Th>
@@ -30,11 +30,11 @@ export function VisitsTable({ rows, currency, compact }: { rows: VisitRow[]; cur
                 </>
               ) : null}
               <Th className="text-end">المتبقي</Th>
-            </tr>
-          </thead>
-          <tbody>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((r) => (
-              <tr
+              <TableRow
                 key={r.id}
                 onClick={() => router.push(`/visits/${r.id}`)}
                 className={cn(
@@ -71,9 +71,9 @@ export function VisitsTable({ rows, currency, compact }: { rows: VisitRow[]; cur
                 <Td className={cn("text-end font-medium", r.remaining > 0 && "text-debt")}>
                   <Money value={r.remaining} currency={currency} plain />
                 </Td>
-              </tr>
+              </TableRow>
             ))}
-          </tbody>
+          </TableBody>
         </Table>
       </div>
 

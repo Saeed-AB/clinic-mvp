@@ -8,8 +8,9 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
-import { Input, Select } from "@/components/ui/input";
-import { Table, Td, Th } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableHeader, TableRow, Td, Th } from "@/components/ui/table";
 import { BalanceBadge, CancelledBadge, VisitStatusBadge, indicatorText } from "@/components/shared/badges";
 import { CancelWithReasonDialog, ConfirmDialog } from "@/components/shared/cancel-dialog";
 import { Money, Num } from "@/components/shared/money";
@@ -152,17 +153,17 @@ export default function VisitDetailsPage() {
             <CardHeader title="الخدمات" />
             {services.length ? (
               <Table>
-                <thead>
-                  <tr>
+                <TableHeader>
+                  <TableRow>
                     <Th>الخدمة</Th>
                     <Th className="text-end">السعر</Th>
                     <Th className="no-print">أضافها</Th>
                     {canEdit ? <Th className="no-print w-10"><span className="sr-only">إجراءات</span></Th> : null}
-                  </tr>
-                </thead>
-                <tbody>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {services.map((s) => (
-                    <tr key={s.id} className={cn(s.cancelled && "text-muted-foreground")}>
+                    <TableRow key={s.id} className={cn(s.cancelled && "text-muted-foreground")}>
                       <Td>
                         <span className={cn(s.cancelled && "line-through")}>{s.name}</span>
                         {s.cancelled ? (
@@ -192,9 +193,9 @@ export default function VisitDetailsPage() {
                           ) : null}
                         </Td>
                       ) : null}
-                    </tr>
+                    </TableRow>
                   ))}
-                </tbody>
+                </TableBody>
               </Table>
             ) : (
               <EmptyState title="لا توجد خدمات بعد" description="أضف الخدمات بعد خروج المريض من الطبيب." className="py-8" />
@@ -215,19 +216,19 @@ export default function VisitDetailsPage() {
             <CardHeader title="الدفعات" />
             {payments.length ? (
               <Table>
-                <thead>
-                  <tr>
+                <TableHeader>
+                  <TableRow>
                     <Th>التاريخ</Th>
                     <Th className="text-end">المبلغ</Th>
                     <Th>طريقة الدفع</Th>
                     <Th>رقم السند</Th>
                     <Th className="no-print">المسجل</Th>
                     {canCancelPay ? <Th className="no-print w-10"><span className="sr-only">إجراءات</span></Th> : null}
-                  </tr>
-                </thead>
-                <tbody>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {payments.map((p) => (
-                    <tr key={p.id} className={cn(p.cancelled && "text-muted-foreground")}>
+                    <TableRow key={p.id} className={cn(p.cancelled && "text-muted-foreground")}>
                       <Td className="text-xs whitespace-nowrap">
                         <Num value={formatDateTime(p.createdAt)} />
                       </Td>
@@ -251,9 +252,9 @@ export default function VisitDetailsPage() {
                           ) : null}
                         </Td>
                       ) : null}
-                    </tr>
+                    </TableRow>
                   ))}
-                </tbody>
+                </TableBody>
               </Table>
             ) : (
               <EmptyState title="لا توجد دفعات" className="py-8" />
@@ -457,20 +458,23 @@ function AddServiceRow({
     <div className="flex flex-wrap items-end gap-2">
       <Field label="إضافة خدمة" htmlFor="add-svc" className="min-w-48 flex-1">
         <Select
-          id="add-svc"
           value={serviceId}
-          onChange={(e) => {
-            setServiceId(e.target.value);
-            const s = services.find((x) => x.id === e.target.value);
+          onValueChange={(v) => {
+            setServiceId(v);
+            const s = services.find((x) => x.id === v);
             setPrice(s ? String(s.defaultPrice) : "");
           }}
         >
-          <option value="">اختر الخدمة</option>
-          {services.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name} — {formatMoney(s.defaultPrice, currency)}
-            </option>
-          ))}
+          <SelectTrigger id="add-svc">
+            <SelectValue placeholder="اختر الخدمة" />
+          </SelectTrigger>
+          <SelectContent>
+            {services.map((s) => (
+              <SelectItem key={s.id} value={s.id}>
+                {s.name} — {formatMoney(s.defaultPrice, currency)}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
       </Field>
       <Field label="السعر" htmlFor="add-svc-price" className="w-32">
@@ -522,12 +526,17 @@ function AddPaymentRow({
           <MoneyInput id="pay-amount" value={amount} onChange={(e) => setAmount(e.target.value)} aria-invalid={!!err} />
         </Field>
         <Field label="طريقة الدفع" htmlFor="pay-method" className="w-40">
-          <Select id="pay-method" value={methodId || methods[0]?.id} onChange={(e) => setMethodId(e.target.value)}>
-            {methods.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name}
-              </option>
-            ))}
+          <Select value={methodId || methods[0]?.id} onValueChange={setMethodId}>
+            <SelectTrigger id="pay-method">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {methods.map((m) => (
+                <SelectItem key={m.id} value={m.id}>
+                  {m.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </Field>
         <Field label="رقم السند" htmlFor="pay-receipt" className="w-28">

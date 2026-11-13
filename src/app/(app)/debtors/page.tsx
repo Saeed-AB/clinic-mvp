@@ -7,8 +7,9 @@ import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input, Select } from "@/components/ui/input";
-import { Table, Td, Th } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableHeader, TableRow, Td, Th } from "@/components/ui/table";
 import { Money, Num } from "@/components/shared/money";
 import { EmptyState, ErrorState, LoadingRows, PageHeader, StatCard } from "@/components/shared/states";
 import { errorMessage } from "@/lib/api/client";
@@ -110,17 +111,27 @@ function DebtorsView() {
           <Input type="search" aria-label="بحث برقم الملف أو الجوال" placeholder="بحث برقم الملف أو الجوال" className="ps-9" value={term} onChange={(e) => setTerm(e.target.value)} />
         </div>
         <div className="w-44">
-          <Select aria-label="الترتيب" value={sort} onChange={(e) => setParam("sort", e.target.value === "oldest" ? "oldest" : "")}>
-            <option value="amount">الأعلى مبلغًا</option>
-            <option value="oldest">الأقدم سدادًا</option>
+          <Select value={sort} onValueChange={(v) => setParam("sort", v === "oldest" ? "oldest" : "")}>
+            <SelectTrigger aria-label="الترتيب">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="amount">الأعلى مبلغًا</SelectItem>
+              <SelectItem value="oldest">الأقدم سدادًا</SelectItem>
+            </SelectContent>
           </Select>
         </div>
         <div className="w-52">
-          <Select aria-label="فلتر الفترة" value={String(inactiveDays || "")} onChange={(e) => setParam("inactive", e.target.value)}>
-            <option value="">كل الفترات</option>
-            <option value="30">لم يسدد منذ أكثر من شهر</option>
-            <option value="60">لم يسدد منذ أكثر من شهرين</option>
-            <option value="90">لم يسدد منذ أكثر من 3 أشهر</option>
+          <Select value={inactiveDays ? String(inactiveDays) : "all"} onValueChange={(v) => setParam("inactive", v === "all" ? "" : v)}>
+            <SelectTrigger aria-label="فلتر الفترة">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">كل الفترات</SelectItem>
+              <SelectItem value="30">لم يسدد منذ أكثر من شهر</SelectItem>
+              <SelectItem value="60">لم يسدد منذ أكثر من شهرين</SelectItem>
+              <SelectItem value="90">لم يسدد منذ أكثر من 3 أشهر</SelectItem>
+            </SelectContent>
           </Select>
         </div>
       </div>
@@ -138,8 +149,8 @@ function DebtorsView() {
               </p>
             ) : null}
             <Table>
-              <thead>
-                <tr>
+              <TableHeader>
+                <TableRow>
                   <Th>رقم الملف</Th>
                   <Th>الاسم</Th>
                   <Th className="max-sm:hidden">الجوال</Th>
@@ -149,11 +160,11 @@ function DebtorsView() {
                   <Th>
                     <span className="sr-only">سداد</span>
                   </Th>
-                </tr>
-              </thead>
-              <tbody>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {data.rows.map((r) => (
-                  <tr key={r.patientId} className="hover:bg-muted/50">
+                  <TableRow key={r.patientId} className="hover:bg-muted/50">
                     <Td>
                       <Num value={String(r.fileNumber)} />
                     </Td>
@@ -175,9 +186,9 @@ function DebtorsView() {
                         <HandCoins /> سداد
                       </Button>
                     </Td>
-                  </tr>
+                  </TableRow>
                 ))}
-              </tbody>
+              </TableBody>
             </Table>
           </>
         ) : filtered ? (

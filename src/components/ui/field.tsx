@@ -1,15 +1,9 @@
 import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
 
-export function Label({ htmlFor, children, required, className }: { htmlFor?: string; children: ReactNode; required?: boolean; className?: string }) {
-  return (
-    <label htmlFor={htmlFor} className={cn("mb-1.5 block text-sm font-medium text-foreground", className)}>
-      {children}
-      {required ? <span className="ms-0.5 text-debt" aria-hidden>*</span> : null}
-    </label>
-  );
-}
+export { Label };
 
+/** غلاف يجمع التسمية (shadcn Label) مع رسالة الخطأ/التلميح — غير موجود في shadcn نفسه، خاص بنماذج هذا المشروع */
 export function Field({
   label,
   htmlFor,

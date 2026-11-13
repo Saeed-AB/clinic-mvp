@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Select } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DateNav } from "@/components/shared/date-nav";
 import { Money, Num } from "@/components/shared/money";
 import { EmptyState, ErrorState, LoadingRows, PageHeader, StatCard } from "@/components/shared/states";
@@ -56,23 +56,33 @@ function VisitsView() {
         <DateNav value={date} onChange={(d) => setParam("date", d === todayAden() ? "" : d)} />
         <div className="flex flex-1 flex-wrap gap-2 sm:flex-none">
           <div className="w-full min-w-36 sm:w-40">
-            <Select aria-label="فلتر الحالة" value={status} onChange={(e) => setParam("status", e.target.value)}>
-              <option value="">كل الحالات</option>
-              {(Object.keys(STATUS_LABEL) as VisitStatus[]).map((s) => (
-                <option key={s} value={s}>
-                  {STATUS_LABEL[s]}
-                </option>
-              ))}
+            <Select value={status || "all"} onValueChange={(v) => setParam("status", v === "all" ? "" : v)}>
+              <SelectTrigger aria-label="فلتر الحالة">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">كل الحالات</SelectItem>
+                {(Object.keys(STATUS_LABEL) as VisitStatus[]).map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {STATUS_LABEL[s]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </div>
           <div className="w-full min-w-40 sm:w-48">
-            <Select aria-label="فلتر الطبيب" value={doctorId} onChange={(e) => setParam("doctor", e.target.value)}>
-              <option value="">كل الأطباء</option>
-              {lookups?.doctors.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name}
-                </option>
-              ))}
+            <Select value={doctorId || "all"} onValueChange={(v) => setParam("doctor", v === "all" ? "" : v)}>
+              <SelectTrigger aria-label="فلتر الطبيب">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">كل الأطباء</SelectItem>
+                {lookups?.doctors.map((d) => (
+                  <SelectItem key={d.id} value={d.id}>
+                    {d.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </div>
         </div>
