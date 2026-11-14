@@ -1,8 +1,9 @@
 import { get, patch, post } from "../api/client";
-import type { PatientInput, PaymentInput } from "../data/repository";
+import type { PatientFilter, PatientInput, PaymentInput } from "../data/repository";
 import type { LedgerEntry, PatientSummary } from "../types";
 
 export const patientsService = {
+  list: (filter: PatientFilter) => get<{ rows: PatientSummary[]; total: number }>("/patients", filter as Record<string, unknown>),
   search: (q: string) => get<{ byFileNumber: PatientSummary | null; byPhone: PatientSummary[] }>("/patients/search", { q }),
   byPhone: (phone: string) => get<PatientSummary[]>("/patients/by-phone", { phone }),
   checkFileNumber: (n: number, exclude?: string) => get<{ taken: boolean; valid: boolean }>("/patients/check-file-number", { n, exclude }),

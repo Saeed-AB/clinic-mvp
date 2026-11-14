@@ -10,6 +10,7 @@ import {
   Menu,
   Settings,
   UserPlus,
+  Users,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -29,6 +30,7 @@ import { useSession } from "@/stores/session";
 
 const NAV = [
   { href: "/", label: "الرئيسية", icon: Home, admin: false },
+  { href: "/patients", label: "المرضى", icon: Users, admin: false },
   { href: "/visits", label: "الزيارات", icon: CalendarDays, admin: false },
   { href: "/debtors", label: "المدينون والسداد", icon: HandCoins, admin: false },
   { href: "/daily-closing", label: "الإقفال اليومي", icon: ClipboardList, admin: false },

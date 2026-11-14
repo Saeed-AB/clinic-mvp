@@ -2,6 +2,7 @@
 // اليوم ينفذه MockRepository، ولاحقًا SupabaseRepository بنفس الدوال، والواجهة لا تتغير.
 
 import type {
+  BalanceIndicator,
   Clinic,
   DailyClosing,
   DashboardData,
@@ -74,6 +75,13 @@ export interface DebtorFilter {
   inactiveDays?: number | null;
 }
 
+export interface PatientFilter {
+  q?: string | null;
+  gender?: Gender | null;
+  indicator?: BalanceIndicator | null;
+  sort?: "name" | "fileNumber" | "balance" | null;
+}
+
 export interface Settings {
   clinic: Clinic;
   services: Service[];
@@ -98,6 +106,7 @@ export interface Repository {
   getDashboard(actor: Actor, date: string): Promise<DashboardData>;
 
   searchPatients(q: string): Promise<{ byFileNumber: PatientSummary | null; byPhone: PatientSummary[] }>;
+  listPatients(filter: PatientFilter): Promise<{ rows: PatientSummary[]; total: number }>;
   isFileNumberTaken(fileNumber: number, excludePatientId?: string): Promise<boolean>;
   createPatient(actor: Actor, input: PatientInput): Promise<PatientSummary>;
   updatePatient(actor: Actor, id: string, input: PatientInput): Promise<PatientSummary>;

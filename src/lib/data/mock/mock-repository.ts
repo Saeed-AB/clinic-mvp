@@ -33,6 +33,7 @@ import {
   AppError,
   type Actor,
   type DebtorFilter,
+  type PatientFilter,
   type PatientInput,
   type PaymentInput,
   type Repository,
@@ -302,6 +303,27 @@ export class MockRepository implements Repository {
       byFileNumber: byFile ? this.summary(byFile) : null,
       byPhone: byPhone.map((p) => this.summary(p)),
     };
+  }
+
+  async listPatients(filter: PatientFilter) {
+    let rows = this.db.patients.map((p) => this.summary(p));
+
+    const q = filter.q?.trim();
+    if (q) {
+      const digits = q.replace(/[^\d]/g, "");
+      rows = rows.filter((p) => String(p.fileNumber) === digits || (digits.length >= 3 && (p.phone ?? "").replace(/[^\d]/g, "").includes(digits)) || p.name.includes(q));
+    }
+    if (filter.gender) rows = rows.filter((p) => p.gender === filter.gender);
+    if (filter.indicator) rows = rows.filter((p) => p.indicator === filter.indicator);
+
+    const sort = filter.sort ?? "name";
+    rows = [...rows].sort((a, b) => {
+      if (sort === "fileNumber") return a.fileNumber - b.fileNumber;
+      if (sort === "balance") return b.balance - a.balance;
+      return a.name.localeCompare(b.name, "ar");
+    });
+
+    return { rows, total: rows.length };
   }
 
   async isFileNumberTaken(fileNumber: number, excludePatientId?: string) {
